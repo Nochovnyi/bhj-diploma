@@ -44,7 +44,7 @@ describe("Класс Entity", function() {
     it('Создаёт POST-запрос', () => {
       const xhr = Entity.create();
 
-      expect(xhr.requestMethod).to.be.equals( 'POST' );
+      expect(xhr.requestMethod).to.be.equals( 'PUT' );
     });
 
     it('Обращается по адресу, определённому в свойстве URL', () => {
@@ -65,13 +65,13 @@ describe("Класс Entity", function() {
     it('Создаёт DELETE-запрос', () => {
       const xhr = Entity.remove();
 
-      expect(xhr.requestMethod).to.be.equals( 'POST' );
+      expect(xhr.requestMethod).to.be.equals( 'DELETE' );
     });
 
     it('Обращается по адресу, определённому в свойстве URL', () => {
       const xhr = Entity.remove();
 
-      expect(xhr.requestURL).to.be.equals( Entity.URL  + '/' );
+      expect(xhr.requestURL).to.be.equals( Entity.URL );
     });
   });
 });

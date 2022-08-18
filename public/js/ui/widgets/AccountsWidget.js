@@ -14,7 +14,13 @@ class AccountsWidget {
    * необходимо выкинуть ошибку.
    * */
   constructor( element ) {
+    if (!element) {
+      throw new Error('Элемент не существует');
+    };
 
+    this.element = element;
+    this.registerEvents();
+    this.update();
   }
 
   /**
@@ -25,7 +31,16 @@ class AccountsWidget {
    * вызывает AccountsWidget.onSelectAccount()
    * */
   registerEvents() {
+    this.element.addEventListener('click', (event) => {
+      event.preventDefault();
 
+      if (event.target.closest('li')) {
+        if (event.target.classList.contains('create-account')) {
+          App.getModal('createAccount').open();
+        }
+        this.onSelectAccount(event.target.closest('li'));
+      }
+    });
   }
 
   /**
@@ -39,7 +54,12 @@ class AccountsWidget {
    * метода renderItem()
    * */
   update() {
-
+    Account.list(null, (err, response) => {
+      if (response && response.success) {
+        this.clear();
+        response.data.forEach(item => this.renderItem(item));
+      }
+     });
   }
 
   /**
@@ -48,7 +68,7 @@ class AccountsWidget {
    * в боковой колонке
    * */
   clear() {
-
+    this.element.querySelectorAll('.account').forEach(element => element.remove());
   }
 
   /**
@@ -59,7 +79,12 @@ class AccountsWidget {
    * Вызывает App.showPage( 'transactions', { account_id: id_счёта });
    * */
   onSelectAccount( element ) {
-
+    if (this.selectedAccount) {
+      this.selectedAccount.classList.remove('active');
+    }
+    element.classList.add('active');
+    this.selectedAccount = element;
+    App.showPage( 'transactions', {account_id: element.dataset.id});
   }
 
   /**
@@ -68,7 +93,14 @@ class AccountsWidget {
    * item - объект с данными о счёте
    * */
   getAccountHTML(item){
-
+    return `
+    <li class="account" data-id="${item.id}">
+      <a href="#">
+          <span>${item.name}</span> /
+          <span>${item.sum.toLocaleString()} ₽</span>
+      </a>
+    </li>    
+  `;
   }
 
   /**
@@ -78,6 +110,6 @@ class AccountsWidget {
    * и добавляет его внутрь элемента виджета
    * */
   renderItem(data){
-
+    this.element.insertAdjacentHTML('beforeend', this.getAccountHTML(data));
   }
 }
